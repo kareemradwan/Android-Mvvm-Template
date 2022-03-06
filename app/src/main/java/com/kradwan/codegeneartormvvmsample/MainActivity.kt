@@ -7,7 +7,9 @@ import androidx.activity.viewModels
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
 import com.kradwan.codegeneartormvvmsample.presentation.MainActivityViewModel
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
 
@@ -33,12 +35,26 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
         viewModel.setStateEvent(AccountStateEvent.GetCountries)
-        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
-        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
-        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
+//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
 
 
     }

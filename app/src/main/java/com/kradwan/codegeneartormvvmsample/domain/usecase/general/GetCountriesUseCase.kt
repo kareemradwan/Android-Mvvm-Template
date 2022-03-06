@@ -8,8 +8,9 @@ import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GetCountriesUseCase(val repo: AccountRepository) {
+class GetCountriesUseCase @Inject constructor(val repo: AccountRepository) {
 
 
     fun execute(): LiveData<DataState<AccountViewState>> {

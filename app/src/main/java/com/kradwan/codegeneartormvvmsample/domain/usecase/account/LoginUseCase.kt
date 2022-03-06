@@ -5,8 +5,9 @@ import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
 import com.kradwan.codegeneartormvvmsample.domain.repository.AccountRepository
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
+import javax.inject.Inject
 
-class LoginUseCase(val repo: AccountRepository) {
+class LoginUseCase @Inject constructor (val repo: AccountRepository) {
 
     fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
 

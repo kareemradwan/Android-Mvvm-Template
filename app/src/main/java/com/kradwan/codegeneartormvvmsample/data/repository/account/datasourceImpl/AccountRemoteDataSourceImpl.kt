@@ -9,9 +9,10 @@ import com.kradwan.codegeneartormvvmsample.data.repository.account.datasource.Ac
 import com.kradwan.codegeneartormvvmsample.domain.util.GenericApiResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-class AccountRemoteDataSourceImpl(private val service: AccountApi) : AccountRemoteDataSource {
+class AccountRemoteDataSourceImpl  @Inject constructor( val service: AccountApi) : AccountRemoteDataSource {
 
     override suspend fun login(request: LoginRequest): LiveData<GenericApiResponse<LoginResponse>> {
 //        delay(10_000)

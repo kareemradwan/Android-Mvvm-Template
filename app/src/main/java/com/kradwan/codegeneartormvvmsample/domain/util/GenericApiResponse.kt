@@ -20,11 +20,16 @@ import java.net.UnknownHostException
 @Suppress("unused") // T is used in extending classes
 sealed class GenericApiResponse<T> {
 
+
+    fun body(): T? {
+        return (this as? ApiSuccessResponse)?.body
+    }
+
     companion object {
         private val TAG: String = "DDDD"
 
         fun <T> create(error: Throwable): ApiErrorResponse<T> {
-            Log.e(TAG, "GenericApiResponse: error: ${error.message}" , error)
+            Log.e(TAG, "GenericApiResponse: error: ${error.message}", error)
             return ApiErrorResponse(error.message ?: "unknown error")
         }
 
@@ -93,4 +98,5 @@ class ApiEmptyResponse<T> : GenericApiResponse<T>()
 
 data class ApiSuccessResponse<T>(val body: T) : GenericApiResponse<T>() {}
 
-data class ApiErrorResponse<T>(val errorMessage: String, val error: T? = null) : GenericApiResponse<T>()
+data class ApiErrorResponse<T>(val errorMessage: String, val error: T? = null) :
+    GenericApiResponse<T>()
