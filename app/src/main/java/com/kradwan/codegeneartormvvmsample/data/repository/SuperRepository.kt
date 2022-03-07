@@ -41,6 +41,7 @@ abstract class SuperRepository {
 
     fun startJob(name: String, job: Job?) {
         addToGroup(name)
+//        Log.d("DDDD")
         if (jobs.contains(name)) {
             // TODO :
             Log.d("DDDD", "Cancel Current Job: $name")

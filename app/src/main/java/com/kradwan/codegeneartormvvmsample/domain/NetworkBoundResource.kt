@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 private val CACHE: LruCache<String, Any> = LruCache(10)
 
-abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
+abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
     val name: String,
     val meta: RequestMeta? = RequestMeta(),
 ) {
@@ -55,7 +55,7 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
                 cachedData?.let {
                     handleApiSuccessResponse(it)
                     if (meta.metaStopIfFoundResult) {
-                        Log.d("DDDD" ,"Found Data on Cache")
+                        Log.d("DDDD", "Found Data on Cache")
                         return@launch
                     }
                 }
@@ -89,7 +89,7 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
             is ApiSuccessResponse -> {
                 val body = response.body
                 if (meta?.metaSaveResponse == true) {
-                    Log.d("DDDD" ,"Save Data on Cache")
+                    Log.d("DDDD", "Save Data on Cache")
                     CACHE.put(name, body)
                 }
                 handleApiSuccessResponse(body)
@@ -113,12 +113,14 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     }
 
 
-    fun onCompleteJob(dataState: DataState<ViewStateType>) {
+    fun onCompleteJob(dataState: DataState<ViewStateType>, cancel: Boolean = true) {
         coroutineScope.launch {
             withContext(Dispatchers.Main) {
-                job?.cancel()
                 setValue(dataState)
-                endJob()
+                if (cancel) {
+                    job?.cancel()
+                    endJob()
+                }
             }
         }
     }
