@@ -1,19 +1,22 @@
 package com.kradwan.codegeneartormvvmsample.domain
 
 import android.util.Log
+import android.util.LruCache
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.kradwan.codegeneartormvvmsample.domain.util.*
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import kotlinx.coroutines.*
+import javax.inject.Inject
+
+
+private val CACHE: LruCache<String, Any> = LruCache(10)
 
 abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     val name: String,
-    val cacheResponse: Boolean = false,
     var fromCache: Boolean = false,
     val fromDb: Boolean = false,
-
-    shouldDisplayLoading: Boolean = true
+    shouldDisplayLoading: Boolean = true,
 ) {
 
 
@@ -48,11 +51,13 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
 
 
             if (fromCache) {
-                fromCache()
+                (CACHE.get(name) as? ResponseObject)?.let { handleApiSuccessResponse(it) }
+//
+////                fromCache()
             }
-            if (fromDb) {
-                fromDB()
-            }
+//            if (fromDb) {
+//                fromDB()
+//            }
 
             withContext(Dispatchers.Main) {
                 // make network call
@@ -77,9 +82,9 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
         when (response) {
             is ApiSuccessResponse -> {
                 val body = response.body
-                if (cacheResponse) {
-
-                }
+//                saveOnCache(body)
+                CACHE.put(name, body)
+//                cache.save(name, body as Any)
                 handleApiSuccessResponse(body)
             }
             is ApiErrorResponse -> {
@@ -99,7 +104,7 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
         onCompleteJob(DataState.error(errorMessage ?: "error msg"))
     }
 
-    abstract fun saveOnCache(body: ResponseObject)
+//    open fun saveOnCache(body: ResponseObject) {}
 
     fun onCompleteJob(dataState: DataState<ViewStateType>) {
         coroutineScope.launch {
@@ -126,9 +131,10 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     abstract suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
 
     //    abstract suspend fun fromDB(): LiveData<GenericApiResponse<ResponseObject>>?
-    abstract suspend fun fromDB()
+    open suspend fun fromDB() {}
 
-    //    abstract suspend fun fromCache(): ResponseObject?
-    abstract suspend fun fromCache()
+
+//    open suspend fun fromCache() {}
+
 
 }

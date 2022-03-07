@@ -10,8 +10,10 @@ import com.kradwan.codegeneartormvvmsample.data.model.general.getCountries.GetCo
 import com.kradwan.codegeneartormvvmsample.data.repository.account.datasource.AccountRemoteDataSource
 import com.kradwan.codegeneartormvvmsample.domain.NetworkBoundResource
 import com.kradwan.codegeneartormvvmsample.domain.repository.AccountRepository
+import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
 import com.kradwan.codegeneartormvvmsample.domain.util.ApiSuccessResponse
 import com.kradwan.codegeneartormvvmsample.domain.util.GenericApiResponse
+import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import javax.inject.Inject
@@ -21,28 +23,12 @@ class AccountRepositoryImpl @Inject constructor(
     val sharedPreferences: SharedPreferences,
     val sharedPrefsEditor: SharedPreferences.Editor,
     val context: Context
-) :
-    AccountRepository {
-
-    private val cache: LruCache<String, Any> = LruCache(100)
+) : AccountRepository() {
 
 
     override fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
 
-        return object :
-            NetworkBoundResource<LoginResponse, Any, AccountViewState>("login", fromCache = false) {
-
-
-            override suspend fun fromCache() {
-                done(AccountViewState(loginResponse = cache.get("login") as? LoginResponse))
-            }
-
-            override fun saveOnCache(body: LoginResponse) {
-                cache.put(name, body)
-            }
-
-            //            override suspend fun fromDB(): LiveData<GenericApiResponse<LoginResponse>>? = null
-            override suspend fun fromDB() {}
+        return object : NetworkBoundResource<LoginResponse, Any, AccountViewState>("login") {
 
             override suspend fun createCall(): LiveData<GenericApiResponse<LoginResponse>> {
                 val response = accountRemoteDataSource.login(request)
@@ -57,42 +43,24 @@ class AccountRepositoryImpl @Inject constructor(
         }.asLiveData()
     }
 
+
+
     override fun getCountries(): LiveData<DataState<AccountViewState>> {
-        return object :
-            NetworkBoundResource<GetCountriesResponse, Any, AccountViewState>("getCountries") {
-
-            init {
-                cache.put(name, GetCountriesResponse("From Cache DataSource "))
-            }
-
-
-            override fun saveOnCache(body: GetCountriesResponse) {
-                cache.put(name, body)
-            }
+        return object : NetworkBoundResource<GetCountriesResponse, Any, AccountViewState>(
+            "getCountries",
+            fromCache = true
+        ) {
 
             override suspend fun createCall(): LiveData<GenericApiResponse<GetCountriesResponse>> {
-                val response = accountRemoteDataSource.getCountries()
-                return response
+                return accountRemoteDataSource.getCountries()
             }
 
             override suspend fun handleApiSuccessResponse(data: GetCountriesResponse) {
                 done(AccountViewState(GetCountriesResponse = data))
             }
 
-            override suspend fun fromCache() {
-                val data = cache.get(name) as? GetCountriesResponse
-                done(AccountViewState(GetCountriesResponse = data))
-            }
-
-            //            override suspend fun fromDB(): LiveData<GenericApiResponse<GetCountriesResponse>>? {
-            override suspend fun fromDB() {
-                return
-            }
-//            override suspend fun fromDB(): LiveData<GenericApiResponse<GetCountriesResponse>>? = null
-
         }.asLiveData()
     }
-
 
     fun <T> NetworkBoundResource<T, Any, AccountViewState>.done(state: AccountViewState) {
         onCompleteJob(

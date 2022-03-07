@@ -1,6 +1,7 @@
 package com.kradwan.codegeneartormvvmsample.data.repository
 
 import android.util.Log
+import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
 import kotlinx.coroutines.Job
 
 abstract class SuperRepository {
@@ -67,5 +68,7 @@ abstract class SuperRepository {
     fun cancelAllJobs() {
         jobs.keys.forEach { cancelJob(it) }
     }
+
+
 
 }

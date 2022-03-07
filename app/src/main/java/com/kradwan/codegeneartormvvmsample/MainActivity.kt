@@ -3,8 +3,11 @@ package com.kradwan.codegeneartormvvmsample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import androidx.activity.viewModels
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
+import com.kradwan.codegeneartormvvmsample.domain.usecase.defaultRequestSetting
+import com.kradwan.codegeneartormvvmsample.domain.usecase.requestSetting
 import com.kradwan.codegeneartormvvmsample.presentation.MainActivityViewModel
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,13 +29,17 @@ class MainActivity : AppCompatActivity() {
             Log.d("DDDD", "DDDD Response Success: $dataState")
 
             dataState?.data?.let {
-                Log.d("DDDD", "DDDD Response Success: $it")
+                it.GetCountriesResponse?.let {
+                    Log.d("DDDD", "DDDD Response GetCountires: $it")
+
+                }
             }
             dataState?.error?.let {
                 Log.d("DDDD", "DDDD Response Error: $it")
 
             }
         }
+
 
 
 //        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
@@ -57,6 +64,9 @@ class MainActivity : AppCompatActivity() {
 //        viewModel.setStateEvent(AccountStateEvent.GetCountries)
 
 
+        findViewById<Button>(R.id.btn).setOnClickListener {
+            viewModel.setStateEvent(AccountStateEvent.GetCountries)
+        }
     }
 
 

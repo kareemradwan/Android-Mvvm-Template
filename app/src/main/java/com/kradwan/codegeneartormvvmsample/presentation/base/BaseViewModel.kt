@@ -2,6 +2,7 @@ package com.kradwan.codegeneartormvvmsample.presentation.base
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 
@@ -58,6 +59,9 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
 //        _stateEvent.postValue(event)
 //        _stateEvent.postValue(null)
     }
+
+
+
 
     /*
 

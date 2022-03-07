@@ -4,6 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kradwan.codegeneartormvvmsample.domain.repository.AccountRepository
+import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
+import com.kradwan.codegeneartormvvmsample.domain.usecase.defaultRequestSetting
+import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import kotlinx.coroutines.delay
@@ -16,6 +19,7 @@ class GetCountriesUseCase @Inject constructor(val repo: AccountRepository) {
     fun execute(): LiveData<DataState<AccountViewState>> {
 
         return repo.getCountries()
+
     }
 
 

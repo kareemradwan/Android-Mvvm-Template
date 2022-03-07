@@ -8,7 +8,7 @@ import dagger.Module
 class ApplicationModule {
     @Module
 //    @InstallIn(SingletonComponent::class)
-    interface LoggerModule{
+    interface LoggerModule {
         //@Binds
         //@ApplicationScope
         //fun bindLogger(loagger : TimberLogger) : Logger

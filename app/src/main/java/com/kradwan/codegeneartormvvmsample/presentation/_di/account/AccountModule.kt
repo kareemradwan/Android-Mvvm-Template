@@ -1,5 +1,6 @@
 package com.kradwan.codegeneartormvvmsample.presentation._di.account
 
+import android.util.LruCache
 import com.kradwan.codegeneartormvvmsample.data.api.account.AccountApi
 import com.kradwan.codegeneartormvvmsample.data.repository.account.datasource.AccountRemoteDataSource
 import com.kradwan.codegeneartormvvmsample.data.repository.account.datasourceImpl.AccountRemoteDataSourceImpl
@@ -21,12 +22,11 @@ class AccountModule {
             .build()
             .create(AccountApi::class.java)
     }
-//
-//    @Singleton
-//    @Provides
-//    fun provideAccountRemoteDataSource(service: AccountApi): AccountRemoteDataSource {
-//        return AccountRemoteDataSourceImpl(
-//            service
-//        )
-//    }
+
+    @Singleton
+    @Provides
+    fun provideLrueCache(): LruCache<String, Any> {
+        return LruCache(10)
+    }
+
 }
