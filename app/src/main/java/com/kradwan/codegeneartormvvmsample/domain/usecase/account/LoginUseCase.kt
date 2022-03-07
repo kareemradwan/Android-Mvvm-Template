@@ -18,3 +18,12 @@ class LoginUseCase @Inject constructor(val repo: AccountRepository) {
     }
 }
 
+
+class LoginUseCase2 @Inject constructor(val repo: AccountRepository) {
+
+    fun login(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>> {
+
+        return repo.login2(request)
+    }
+}
+

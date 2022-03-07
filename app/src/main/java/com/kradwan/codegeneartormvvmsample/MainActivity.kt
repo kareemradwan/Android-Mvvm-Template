@@ -6,7 +6,6 @@ import android.util.Log
 import android.widget.Button
 import androidx.activity.viewModels
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
-import com.kradwan.codegeneartormvvmsample.domain.usecase.defaultRequestSetting
 import com.kradwan.codegeneartormvvmsample.domain.usecase.requestSetting
 import com.kradwan.codegeneartormvvmsample.presentation.MainActivityViewModel
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
@@ -26,7 +25,6 @@ class MainActivity : AppCompatActivity() {
 
 
         viewModel.dataState.observe(this) { dataState ->
-            Log.d("DDDD", "DDDD Response Success: $dataState")
 
             dataState?.data?.let {
                 it.GetCountriesResponse?.let {
@@ -41,9 +39,6 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
-        viewModel.setStateEvent(AccountStateEvent.GetCountries)
 //        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
 //        viewModel.setStateEvent(AccountStateEvent.GetCountries)
 //        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
@@ -65,7 +60,26 @@ class MainActivity : AppCompatActivity() {
 
 
         findViewById<Button>(R.id.btn).setOnClickListener {
-            viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//            viewModel.setStateEvent(AccountStateEvent.GetCountries)
+            viewModel.setStateEvent(AccountStateEvent.Login2(
+                requestSetting {
+                    meta {
+                        metaFromCache = true
+                        metaFromNetwork = true
+                        metaSaveResponse = true
+                        metaFromDB = true
+                        metaStopIfFoundResult = false
+                        metaShowLoading = false
+                    }
+                    settingData = LoginRequest("dsa", "dsa")
+                }
+            ))
+
+        }
+
+        requestSetting<String> {
+            meta {
+            }
         }
     }
 

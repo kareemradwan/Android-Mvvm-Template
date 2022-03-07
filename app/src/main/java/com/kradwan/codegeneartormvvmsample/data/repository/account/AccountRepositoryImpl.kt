@@ -2,7 +2,6 @@ package com.kradwan.codegeneartormvvmsample.data.repository.account
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.collection.LruCache
 import androidx.lifecycle.LiveData
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginResponse
@@ -11,9 +10,7 @@ import com.kradwan.codegeneartormvvmsample.data.repository.account.datasource.Ac
 import com.kradwan.codegeneartormvvmsample.domain.NetworkBoundResource
 import com.kradwan.codegeneartormvvmsample.domain.repository.AccountRepository
 import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
-import com.kradwan.codegeneartormvvmsample.domain.util.ApiSuccessResponse
 import com.kradwan.codegeneartormvvmsample.domain.util.GenericApiResponse
-import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import javax.inject.Inject
@@ -31,11 +28,13 @@ class AccountRepositoryImpl @Inject constructor(
         return object : NetworkBoundResource<LoginResponse, Any, AccountViewState>("login") {
 
             override suspend fun createCall(): LiveData<GenericApiResponse<LoginResponse>> {
-                val response = accountRemoteDataSource.login(request)
-                return response
+                return accountRemoteDataSource.login(request)
             }
 
-            //            override suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<LoginResponse>) {
+            override suspend fun fromDB() {
+                done(AccountViewState(loginResponse = LoginResponse("dsa")))
+            }
+
             override suspend fun handleApiSuccessResponse(data: LoginResponse) {
                 done(AccountViewState(loginResponse = data))
             }
@@ -44,17 +43,36 @@ class AccountRepositoryImpl @Inject constructor(
     }
 
 
-
-    override fun getCountries(): LiveData<DataState<AccountViewState>> {
+    override fun getCountries(request: RequestSetting<Nothing>): LiveData<DataState<AccountViewState>> {
         return object : NetworkBoundResource<GetCountriesResponse, Any, AccountViewState>(
             "getCountries",
-            fromCache = true
+            request.meta()
         ) {
 
             override suspend fun createCall(): LiveData<GenericApiResponse<GetCountriesResponse>> {
                 return accountRemoteDataSource.getCountries()
             }
 
+            override suspend fun handleApiSuccessResponse(data: GetCountriesResponse) {
+                done(AccountViewState(GetCountriesResponse = data))
+            }
+
+        }.asLiveData()
+    }
+
+    override fun login2(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>> {
+        return object : NetworkBoundResource<GetCountriesResponse, Any, AccountViewState>(
+            "getCountries2",
+            request.meta()
+        ) {
+
+            override suspend fun createCall(): LiveData<GenericApiResponse<GetCountriesResponse>> {
+                return accountRemoteDataSource.getCountries()
+            }
+
+            override suspend fun fromDB() {
+                done(AccountViewState(GetCountriesResponse = GetCountriesResponse("from DB")))
+            }
             override suspend fun handleApiSuccessResponse(data: GetCountriesResponse) {
                 done(AccountViewState(GetCountriesResponse = data))
             }

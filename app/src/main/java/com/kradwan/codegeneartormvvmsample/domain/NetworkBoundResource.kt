@@ -4,6 +4,7 @@ import android.util.Log
 import android.util.LruCache
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestMeta
 import com.kradwan.codegeneartormvvmsample.domain.util.*
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import kotlinx.coroutines.*
@@ -14,9 +15,7 @@ private val CACHE: LruCache<String, Any> = LruCache(10)
 
 abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     val name: String,
-    var fromCache: Boolean = false,
-    val fromDb: Boolean = false,
-    shouldDisplayLoading: Boolean = true,
+    val meta: RequestMeta? = RequestMeta(),
 ) {
 
 
@@ -33,7 +32,6 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     fun asLiveData() = result as LiveData<DataState<ViewStateType>>
 
     init {
-        setValue(DataState.loading(isLoading = shouldDisplayLoading, cachedData = null))
 
         doNetworkRequest()
     }
@@ -47,17 +45,25 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
             return
         }
 
+        setValue(DataState.loading(isLoading = meta?.metaShowLoading ?: false, cachedData = null))
+
         job = coroutineScope.launch {
 
 
-            if (fromCache) {
-                (CACHE.get(name) as? ResponseObject)?.let { handleApiSuccessResponse(it) }
-//
-////                fromCache()
+            if (meta?.metaFromCache == true) {
+                val cachedData = (CACHE.get(name) as? ResponseObject)
+                cachedData?.let {
+                    handleApiSuccessResponse(it)
+                    if (meta.metaStopIfFoundResult) {
+                        Log.d("DDDD" ,"Found Data on Cache")
+                        return@launch
+                    }
+                }
             }
-//            if (fromDb) {
-//                fromDB()
-//            }
+
+            if (meta?.metaFromDB == true) {
+                fromDB()
+            }
 
             withContext(Dispatchers.Main) {
                 // make network call
@@ -82,9 +88,10 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
         when (response) {
             is ApiSuccessResponse -> {
                 val body = response.body
-//                saveOnCache(body)
-                CACHE.put(name, body)
-//                cache.save(name, body as Any)
+                if (meta?.metaSaveResponse == true) {
+                    Log.d("DDDD" ,"Save Data on Cache")
+                    CACHE.put(name, body)
+                }
                 handleApiSuccessResponse(body)
             }
             is ApiErrorResponse -> {
@@ -96,6 +103,7 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
         }
     }
 
+
     public fun onErrorReturn(
         errorMessage: String?,
         shouldUseDialog: Boolean,
@@ -104,7 +112,6 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
         onCompleteJob(DataState.error(errorMessage ?: "error msg"))
     }
 
-//    open fun saveOnCache(body: ResponseObject) {}
 
     fun onCompleteJob(dataState: DataState<ViewStateType>) {
         coroutineScope.launch {
@@ -117,24 +124,15 @@ abstract class NetworkBoundResource<ResponseObject, CacheObject, ViewStateType>(
     }
 
 
-    //    abstract suspend fun handleApiSuccessResponse(response: ApiSuccessResponse<ResponseObject>)
     abstract suspend fun handleApiSuccessResponse(data: ResponseObject)
 
-    open fun endJob() {
-        Log.d("DDDDD", "End Job: ${name}")
-    }
+    open fun endJob() {}
 
-    open fun pushJob(job: Job) {
-        Log.d("DDDDD", "Push Job: ${name}")
-    }
+    open fun pushJob(job: Job) {}
 
     abstract suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
 
-    //    abstract suspend fun fromDB(): LiveData<GenericApiResponse<ResponseObject>>?
     open suspend fun fromDB() {}
-
-
-//    open suspend fun fromCache() {}
 
 
 }

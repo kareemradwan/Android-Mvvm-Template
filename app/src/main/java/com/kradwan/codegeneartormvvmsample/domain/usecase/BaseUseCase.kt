@@ -1,52 +1,64 @@
 package com.kradwan.codegeneartormvvmsample.domain.usecase
 
 import androidx.lifecycle.LiveData
-import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 
+@DslMarker
+annotation class HtmlTagMarker
 
+@HtmlTagMarker
 class RequestMeta {
-    var showLoading: Boolean = true
-    var fromNetwork: Boolean = false
-    var fromCache: Boolean = false
-    var fromDB: Boolean = false
-    var stopIfFoundResult = false
+    var metaShowLoading: Boolean = true
+    var metaFromNetwork: Boolean = true
+    var metaFromCache: Boolean = false
+    var metaFromDB: Boolean = false
+    var metaSaveResponse: Boolean = false
+    var metaStopIfFoundResult = false
 
 }
 
 
+@HtmlTagMarker
 class RequestSetting<T> {
+    var settingName: String = "default"
+    private var settingMeta: RequestMeta? = null
+    var settingData: T? = null
 
-    lateinit var meta: RequestMeta
-    var event: T? = null
 
+    @HtmlTagMarker
+    fun meta(init: RequestMeta.() -> Unit): RequestMeta {
+        val meta = RequestMeta()
+        meta.init()
+        this.settingMeta = meta
+        return meta
+    }
 
+    fun meta(): RequestMeta = settingMeta ?: RequestMeta()
 }
 
-fun meta(init: RequestMeta.() -> Unit): RequestMeta {
-    val meta = RequestMeta()
-    meta.init()
-    return meta
-}
 
+@HtmlTagMarker
 fun <T> requestSetting(init: RequestSetting<T>.() -> Unit): RequestSetting<T> {
     val setting = RequestSetting<T>()
     setting.init()
+
     return setting
 }
 
-fun <T> defaultRequestSetting(action: T?): RequestSetting<T> {
+
+@HtmlTagMarker
+fun <T> defaultRequestSetting(action: T? = null): RequestSetting<T> {
     return requestSetting {
         meta {
-            fromNetwork = true
-            stopIfFoundResult = true
+            metaFromNetwork = true
+            metaStopIfFoundResult = true
         }
-        event = action
+        settingData = action
     }
 }
 
 interface BaseUseCase<A : Any> {
 
-    fun  execute(request: RequestSetting<A>) : LiveData<DataState<AccountViewState>>
+    fun execute(request: RequestSetting<A>): LiveData<DataState<AccountViewState>>
 }

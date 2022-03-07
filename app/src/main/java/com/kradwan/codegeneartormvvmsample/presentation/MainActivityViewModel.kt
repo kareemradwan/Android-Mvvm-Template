@@ -1,8 +1,8 @@
 package com.kradwan.codegeneartormvvmsample.presentation
 
 import androidx.lifecycle.LiveData
-import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
 import com.kradwan.codegeneartormvvmsample.domain.usecase.account.LoginUseCase
+import com.kradwan.codegeneartormvvmsample.domain.usecase.account.LoginUseCase2
 import com.kradwan.codegeneartormvvmsample.domain.usecase.general.GetCountriesUseCase
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
@@ -14,6 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
+    private val login2UseCase: LoginUseCase2,
     val getCountries: GetCountriesUseCase,
 ) : BaseViewModel<AccountStateEvent, AccountViewState>() {
 
@@ -22,6 +23,7 @@ class MainActivityViewModel @Inject constructor(
         return when (stateEvent) {
             is AccountStateEvent.Login -> loginUseCase.login(stateEvent.request)
             is AccountStateEvent.GetCountries -> getCountries.execute()
+            is AccountStateEvent.Login2 -> login2UseCase.login(request = stateEvent.request)
         }
 
     }

@@ -13,9 +13,10 @@ abstract class AccountRepository : SuperRepository() {
 
 
     abstract fun login(request: LoginRequest): LiveData<DataState<AccountViewState>>
+    abstract fun login2(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>>
 
 
-    abstract fun getCountries(): LiveData<DataState<AccountViewState>>
+    abstract fun getCountries(request: RequestSetting<Nothing> = RequestSetting()): LiveData<DataState<AccountViewState>>
 
 
 }

@@ -48,7 +48,7 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
         val source = handleStateEvent(event)
         sources.add(source)
         result.addSource(source) {
-            Log.d("DDDD", "addSource: ${it}")
+//            Log.d("DDDD", "addSource: ${it}")
 //            dsa.value = null
 //            dsa.value = it
             result.value = it
