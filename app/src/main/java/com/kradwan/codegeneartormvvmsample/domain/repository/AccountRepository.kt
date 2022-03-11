@@ -12,11 +12,11 @@ import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 abstract class AccountRepository : SuperRepository() {
 
 
-    abstract fun login(request: LoginRequest): LiveData<DataState<AccountViewState>>
-    abstract fun login2(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>>
+    abstract suspend fun login(request: LoginRequest): LiveData<DataState<AccountViewState>>
+    abstract suspend fun login2(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>>
 
 
-    abstract fun getCountries(request: RequestSetting<Nothing> = RequestSetting()): LiveData<DataState<AccountViewState>>
+    abstract suspend fun getCountries(request: RequestSetting<Nothing> = RequestSetting()): LiveData<DataState<AccountViewState>>
 
 
 }

@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 class LoginUseCase @Inject constructor(val repo: AccountRepository) {
 
-    fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
+    suspend fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
 
         return repo.login(request)
     }
@@ -21,7 +21,7 @@ class LoginUseCase @Inject constructor(val repo: AccountRepository) {
 
 class LoginUseCase2 @Inject constructor(val repo: AccountRepository) {
 
-    fun login(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>> {
+  suspend  fun login(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>> {
 
         return repo.login2(request)
     }

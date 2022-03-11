@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
+import kotlinx.coroutines.*
 
 abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
 
@@ -23,6 +24,9 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
 //    fun navigate(action: NavDirections){
 //        _navigateScreen!!.value = Event(action)
 //    }
+
+
+    public val jobs = ArrayList<Job>()
 
     val viewState: LiveData<ViewState>
         get() = _viewState
@@ -45,23 +49,28 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
 
     fun setStateEvent(event: StateEvent) {
 
-        val source = handleStateEvent(event)
-        sources.add(source)
-        result.addSource(source) {
-//            Log.d("DDDD", "addSource: ${it}")
-//            dsa.value = null
-//            dsa.value = it
-            result.value = it
-//            result.removeSource(source)
-//            dataState.value = it
+        val job = viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val source = handleStateEvent(event)
+                withContext(Dispatchers.Main) {
+                    sources.add(source)
+                    result.addSource(source) {
+                        result.value = it
+                    }
+                }
+            }
         }
-//        Log.d("DDDD" , "addSource: size : ${result.hasObservers()}")
-//        _stateEvent.postValue(event)
-//        _stateEvent.postValue(null)
+       
+        this.jobs.add(job)
     }
 
-
-
+    public fun clear() {
+        jobs.forEach {
+            Log.d("DDDD", " Job Cancel : ${it}")
+            it.cancel("done")
+        }
+        jobs.clear()
+    }
 
     /*
 
@@ -88,7 +97,7 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
         return value
     }
 
-    abstract fun handleStateEvent(stateEvent: StateEvent): LiveData<DataState<ViewState>>
+    abstract suspend fun handleStateEvent(stateEvent: StateEvent): LiveData<DataState<ViewState>>
 
     abstract fun initNewViewState(): ViewState
 
@@ -142,6 +151,7 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
                 getProfile(it)
             }
         }
+
     private fun getProfile(id: Int): LiveData<String> {
         TODO()
     }

@@ -5,12 +5,17 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.activity.viewModels
+import androidx.lifecycle.viewModelScope
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
 import com.kradwan.codegeneartormvvmsample.domain.usecase.defaultRequestSetting
 import com.kradwan.codegeneartormvvmsample.domain.usecase.requestSetting
 import com.kradwan.codegeneartormvvmsample.presentation.MainActivityViewModel
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -62,13 +67,22 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn).setOnClickListener {
 //            viewModel.setStateEvent(AccountStateEvent.GetCountries)
+//            viewModel.setStateEvent(
+//                AccountStateEvent.Login2(
+////
+//                    defaultRequestSetting(LoginRequest("das", ""))
+//                )
+//            )
+
             viewModel.setStateEvent(
-                AccountStateEvent.Login2(
-//
-                    defaultRequestSetting(LoginRequest("das", ""))
-                )
+                AccountStateEvent.GetCountries
             )
 
+           GlobalScope.launch {
+               delay(20)
+               Log.d("DDDD" ,"Main Cancel :) ")
+               viewModel.clear()
+           }
         }
 
         requestSetting<String> {

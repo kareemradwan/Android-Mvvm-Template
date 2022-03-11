@@ -16,7 +16,7 @@ import javax.inject.Inject
 class GetCountriesUseCase @Inject constructor(val repo: AccountRepository) {
 
 
-    fun execute(): LiveData<DataState<AccountViewState>> {
+    suspend fun execute(): LiveData<DataState<AccountViewState>> {
 
         return repo.getCountries()
 

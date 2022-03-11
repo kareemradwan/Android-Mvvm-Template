@@ -21,7 +21,7 @@ class MainActivityViewModel @Inject constructor(
 ) : BaseViewModel<AccountStateEvent, AccountViewState>() {
 
 
-    override fun handleStateEvent(stateEvent: AccountStateEvent): LiveData<DataState<AccountViewState>> {
+    override suspend fun handleStateEvent(stateEvent: AccountStateEvent): LiveData<DataState<AccountViewState>> {
         return when (stateEvent) {
             is AccountStateEvent.Login -> loginUseCase.login(stateEvent.request)
             is AccountStateEvent.GetCountries -> getCountries.execute()
@@ -42,6 +42,14 @@ class MainActivityViewModel @Inject constructor(
                 }
             )
         )
+    }
+
+    fun ds(){
+        onCleared()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 
 
