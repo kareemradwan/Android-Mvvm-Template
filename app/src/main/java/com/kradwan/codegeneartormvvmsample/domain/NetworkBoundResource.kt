@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestMeta
 import com.kradwan.codegeneartormvvmsample.domain.util.*
+import com.kradwan.codegeneartormvvmsample.presentation._di.account.AccountScope
 import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -13,10 +14,12 @@ import javax.inject.Inject
 
 private val CACHE: LruCache<String, Any> = LruCache(10)
 
-abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
+open class NetworkBoundResource<ResponseObject, ViewStateType>(
     val name: String,
     val meta: RequestMeta? = RequestMeta(),
 ) {
+
+
 
 
     private var job: Job? = null
@@ -104,7 +107,7 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
     }
 
 
-    public fun onErrorReturn(
+    open fun onErrorReturn(
         errorMessage: String?,
         shouldUseDialog: Boolean,
         shouldUseToast: Boolean
@@ -113,7 +116,7 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
     }
 
 
-    fun onCompleteJob(dataState: DataState<ViewStateType>, cancel: Boolean = true) {
+    open fun onCompleteJob(dataState: DataState<ViewStateType>, cancel: Boolean = true) {
         coroutineScope.launch {
             withContext(Dispatchers.Main) {
                 setValue(dataState)
@@ -126,13 +129,17 @@ abstract class NetworkBoundResource<ResponseObject, ViewStateType>(
     }
 
 
-    abstract suspend fun handleApiSuccessResponse(data: ResponseObject)
+    //    abstract suspend fun handleApiSuccessResponse(data: ResponseObject)
+    open suspend fun handleApiSuccessResponse(data: ResponseObject) {}
 
     open fun endJob() {}
 
     open fun pushJob(job: Job) {}
 
-    abstract suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
+    //    abstract suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
+    open suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>> {
+        TODO()
+    }
 
     open suspend fun fromDB() {}
 

@@ -29,7 +29,7 @@ class AccountRepositoryImpl @Inject constructor(
 
     override fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
 
-        return object : NetworkBoundResource<LoginResponse, AccountViewState>("login") {
+        return object : NetworkBoundResource<LoginResponse, AccountViewState>("login" ) {
 
             override fun pushJob(job: Job) {
                 startJob(name, job)
@@ -39,12 +39,9 @@ class AccountRepositoryImpl @Inject constructor(
                 finishJob(name)
             }
 
+
             override suspend fun createCall(): LiveData<GenericApiResponse<LoginResponse>> {
                 return accountRemoteDataSource.login(request)
-            }
-
-            override suspend fun fromDB() {
-                done(AccountViewState(loginResponse = LoginResponse("dsa")))
             }
 
             override suspend fun handleApiSuccessResponse(data: LoginResponse) {

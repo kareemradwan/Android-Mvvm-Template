@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Button
 import androidx.activity.viewModels
 import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
+import com.kradwan.codegeneartormvvmsample.domain.usecase.defaultRequestSetting
 import com.kradwan.codegeneartormvvmsample.domain.usecase.requestSetting
 import com.kradwan.codegeneartormvvmsample.presentation.MainActivityViewModel
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
@@ -61,19 +62,12 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btn).setOnClickListener {
 //            viewModel.setStateEvent(AccountStateEvent.GetCountries)
-            viewModel.setStateEvent(AccountStateEvent.Login2(
-                requestSetting {
-                    meta {
-                        metaFromCache = true
-                        metaFromNetwork = true
-                        metaSaveResponse = true
-                        metaFromDB = true
-                        metaStopIfFoundResult = false
-                        metaShowLoading = false
-                    }
-                    settingData = LoginRequest("dsa", "dsa")
-                }
-            ))
+            viewModel.setStateEvent(
+                AccountStateEvent.Login2(
+//
+                    defaultRequestSetting(LoginRequest("das", ""))
+                )
+            )
 
         }
 
