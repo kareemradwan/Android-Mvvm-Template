@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_mobile"
+    app:startDestination="@id/start_home_fragment">
+
+    <fragment
+        android:id="@+id/start_home_fragment"
+        android:name="com.kradwan.codegeneartormvvmsample.presentation.start_feature.start.StartMainFragment"
+        android:label="Start Main Fragment" />
+</navigation>

@@ -1,100 +1,68 @@
 package com.kradwan.codegeneartormvvmsample.domain
 
-import android.util.Log
-import android.util.LruCache
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestMeta
 import com.kradwan.codegeneartormvvmsample.domain.util.*
-import com.kradwan.codegeneartormvvmsample.presentation._di.account.AccountScope
-import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
+import com.kradwan.codegeneartormvvmsample.presentation._base.DataState
 import kotlinx.coroutines.*
-import javax.inject.Inject
 
 
-private val CACHE: LruCache<String, Any> = LruCache(10)
+open class NetworkBoundResource<ResponseObject, ViewStateType> {
 
-open class NetworkBoundResource<ResponseObject, ViewStateType>(
-    val name: String,
-    val meta: RequestMeta? = RequestMeta(),
-) {
+    companion object {
+        suspend fun <T, B> createRequest(init: suspend (NetworkBoundResource<T, B>.() -> Unit)): LiveData<DataState<B>> {
+            val setting = NetworkBoundResource<T, B>()
+            setting.init()
+            setting.startWork()
+            return setting.asLiveData()
+        }
 
-
-
-
-    private var job: Job? = null
-
-    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
+    }
 
     private val result = MediatorLiveData<DataState<ViewStateType>>()
 
     fun setValue(dataState: DataState<ViewStateType>) {
-        result.value = dataState
+
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.Main) {
+                result.value = dataState
+            }
+        }
     }
 
     fun asLiveData() = result as LiveData<DataState<ViewStateType>>
 
-    init {
-
-        doNetworkRequest()
-    }
 
     open fun validate(): Boolean {
         return true
     }
 
-    private fun doNetworkRequest() {
+    public suspend fun startWork() {
         if (!validate()) {
             return
         }
 
-        setValue(DataState.loading(isLoading = meta?.metaShowLoading ?: false, cachedData = null))
 
-        job = coroutineScope.launch {
+        setValue(DataState.loading(isLoading = true, cachedData = null))
 
-
-            if (meta?.metaFromCache == true) {
-                val cachedData = (CACHE.get(name) as? ResponseObject)
-                cachedData?.let {
-                    handleApiSuccessResponse(it)
-                    if (meta.metaStopIfFoundResult) {
-                        Log.d("DDDD", "Found Data on Cache")
-                        return@launch
-                    }
+        val apiResponse = createCallFun
+        result.addSource(apiResponse) { response ->
+            result.removeSource(apiResponse)
+            CoroutineScope(Dispatchers.Main).launch {
+                withContext(Dispatchers.Main) {
+                    handleNetworkCall(response)
                 }
             }
 
-            if (meta?.metaFromDB == true) {
-                fromDB()
-            }
-
-            withContext(Dispatchers.Main) {
-                // make network call
-                val apiResponse = createCall()
-                result.addSource(apiResponse) { response ->
-
-                    result.removeSource(apiResponse)
-                    coroutineScope.launch {
-                        handleNetworkCall(response)
-                    }
-                }
-            }
-        }
-        job?.let {
-            pushJob(it)
         }
 
 
     }
 
-    private suspend fun handleNetworkCall(response: GenericApiResponse<ResponseObject>) {
+    private fun handleNetworkCall(response: GenericApiResponse<ResponseObject>) {
         when (response) {
             is ApiSuccessResponse -> {
                 val body = response.body
-                if (meta?.metaSaveResponse == true) {
-                    Log.d("DDDD", "Save Data on Cache")
-                    CACHE.put(name, body)
-                }
                 handleApiSuccessResponse(body)
             }
             is ApiErrorResponse -> {
@@ -117,29 +85,12 @@ open class NetworkBoundResource<ResponseObject, ViewStateType>(
 
 
     open fun onCompleteJob(dataState: DataState<ViewStateType>, cancel: Boolean = true) {
-        coroutineScope.launch {
-            withContext(Dispatchers.Main) {
-                setValue(dataState)
-                if (cancel) {
-                    job?.cancel()
-                    endJob()
-                }
-            }
-        }
+        setValue(dataState)
     }
 
 
-    //    abstract suspend fun handleApiSuccessResponse(data: ResponseObject)
-    open suspend fun handleApiSuccessResponse(data: ResponseObject) {}
-
-    open fun endJob() {}
-
-    open fun pushJob(job: Job) {}
-
-    //    abstract suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>>
-    open suspend fun createCall(): LiveData<GenericApiResponse<ResponseObject>> {
-        TODO()
-    }
+    lateinit var handleApiSuccessResponse: (ResponseObject) -> Unit
+    lateinit var createCallFun: LiveData<GenericApiResponse<ResponseObject>>
 
     open suspend fun fromDB() {}
 

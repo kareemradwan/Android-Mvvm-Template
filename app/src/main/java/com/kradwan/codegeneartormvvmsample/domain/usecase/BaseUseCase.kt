@@ -1,8 +1,5 @@
 package com.kradwan.codegeneartormvvmsample.domain.usecase
 
-import androidx.lifecycle.LiveData
-import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
-import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
 
 @DslMarker
 annotation class HtmlTagMarker
@@ -58,7 +55,3 @@ fun <T> defaultRequestSetting(action: T? = null): RequestSetting<T> {
     }
 }
 
-interface BaseUseCase<A : Any> {
-
-    fun execute(request: RequestSetting<A>): LiveData<DataState<AccountViewState>>
-}

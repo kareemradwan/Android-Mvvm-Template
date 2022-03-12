@@ -9,14 +9,9 @@ import com.kradwan.codegeneartormvvmsample.data.model.general.getCountries.GetCo
 import com.kradwan.codegeneartormvvmsample.data.repository.account.datasource.AccountRemoteDataSource
 import com.kradwan.codegeneartormvvmsample.domain.NetworkBoundResource
 import com.kradwan.codegeneartormvvmsample.domain.repository.AccountRepository
-import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestMeta
 import com.kradwan.codegeneartormvvmsample.domain.usecase.RequestSetting
-import com.kradwan.codegeneartormvvmsample.domain.usecase.requestSetting
-import com.kradwan.codegeneartormvvmsample.domain.util.GenericApiResponse
 import com.kradwan.codegeneartormvvmsample.presentation.account.AccountViewState
-import com.kradwan.codegeneartormvvmsample.presentation.state.DataState
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.kradwan.codegeneartormvvmsample.presentation._base.DataState
 import javax.inject.Inject
 
 class AccountRepositoryImpl @Inject constructor(
@@ -27,82 +22,33 @@ class AccountRepositoryImpl @Inject constructor(
 ) : AccountRepository() {
 
 
-    override fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
+    override suspend fun login(request: LoginRequest): LiveData<DataState<AccountViewState>> {
 
-        return object : NetworkBoundResource<LoginResponse, AccountViewState>("login" ) {
+        return NetworkBoundResource.createRequest<LoginResponse, AccountViewState> {
+            this.createCallFun = accountRemoteDataSource.login(request)
+            this.handleApiSuccessResponse = { it -> done(AccountViewState(loginResponse = it)) }
+        }
 
-            override fun pushJob(job: Job) {
-                startJob(name, job)
-            }
-
-            override fun endJob() {
-                finishJob(name)
-            }
-
-
-            override suspend fun createCall(): LiveData<GenericApiResponse<LoginResponse>> {
-                return accountRemoteDataSource.login(request)
-            }
-
-            override suspend fun handleApiSuccessResponse(data: LoginResponse) {
-                done(AccountViewState(loginResponse = data))
-            }
-
-        }.asLiveData()
     }
 
+    override suspend fun getCountries(request: RequestSetting<Nothing>): LiveData<DataState<AccountViewState>> {
 
-    override fun getCountries(request: RequestSetting<Nothing>): LiveData<DataState<AccountViewState>> {
-        return object :
-            NetworkBoundResource<GetCountriesResponse, AccountViewState>("getCountries") {
-
-            override suspend fun createCall(): LiveData<GenericApiResponse<GetCountriesResponse>> {
-                return accountRemoteDataSource.getCountries()
+//        delay(3000)
+        return NetworkBoundResource.createRequest<GetCountriesResponse, AccountViewState> {
+            this.createCallFun = accountRemoteDataSource.getCountries()
+            this.handleApiSuccessResponse = { it ->
+                done(AccountViewState(GetCountriesResponse = it))
             }
-
-            override suspend fun handleApiSuccessResponse(data: GetCountriesResponse) {
-                done(AccountViewState(GetCountriesResponse = data))
-            }
-
-            override fun pushJob(job: Job) {
-                startJob(name, job)
-            }
-
-            override fun endJob() {
-                finishJob(name)
-            }
-
-        }.asLiveData()
+        }
     }
 
-    override fun login2(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>> {
-        return object : NetworkBoundResource<GetCountriesResponse, AccountViewState>(
-            "getCountries2",
-            request.meta()
-        ) {
-
-            override suspend fun createCall(): LiveData<GenericApiResponse<GetCountriesResponse>> {
-                delay(3000)
-                return accountRemoteDataSource.getCountries()
+    override suspend fun login2(request: RequestSetting<LoginRequest>): LiveData<DataState<AccountViewState>> {
+        return NetworkBoundResource.createRequest<GetCountriesResponse, AccountViewState> {
+            this.createCallFun = accountRemoteDataSource.getCountries()
+            this.handleApiSuccessResponse = { it ->
+                done(AccountViewState(GetCountriesResponse = it))
             }
-
-            override suspend fun fromDB() {
-                done(AccountViewState(GetCountriesResponse = GetCountriesResponse("from DB")) , false)
-            }
-
-            override suspend fun handleApiSuccessResponse(data: GetCountriesResponse) {
-                done(AccountViewState(GetCountriesResponse = data))
-            }
-
-            override fun pushJob(job: Job) {
-                startJob(name, job)
-            }
-
-            override fun endJob() {
-                finishJob(name)
-            }
-
-        }.asLiveData()
+        }
     }
 
     fun <T> NetworkBoundResource<T, AccountViewState>.done(
