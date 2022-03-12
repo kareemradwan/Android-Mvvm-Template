@@ -1,94 +1,29 @@
 package com.kradwan.codegeneartormvvmsample
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
 import androidx.activity.viewModels
-import androidx.lifecycle.viewModelScope
-import com.kradwan.codegeneartormvvmsample.data.model.account.login.LoginRequest
-import com.kradwan.codegeneartormvvmsample.domain.usecase.defaultRequestSetting
-import com.kradwan.codegeneartormvvmsample.domain.usecase.requestSetting
-import com.kradwan.codegeneartormvvmsample.presentation.MainActivityViewModel
-import com.kradwan.codegeneartormvvmsample.presentation.account.AccountStateEvent
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import com.kradwan.codegeneartormvvmsample.presentation._base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
 
-    private val viewModel: MainActivityViewModel by viewModels()
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
 
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.findNavController()
 
 
-        viewModel.dataState.observe(this) { dataState ->
-
-            dataState?.data?.let {
-                it.GetCountriesResponse?.let {
-                    Log.d("DDDD", "DDDD Response GetCountires: $it")
-
-                }
-            }
-            dataState?.error?.let {
-                Log.d("DDDD", "DDDD Response Error: $it")
-
-            }
-        }
-
-
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email1", "password1")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email2", "password2")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//        viewModel.setStateEvent(AccountStateEvent.Login(LoginRequest("email3", "password3")))
-//        viewModel.setStateEvent(AccountStateEvent.GetCountries)
-
-
-        findViewById<Button>(R.id.btn).setOnClickListener {
-//            viewModel.setStateEvent(AccountStateEvent.GetCountries)
-//            viewModel.setStateEvent(
-//                AccountStateEvent.Login2(
-////
-//                    defaultRequestSetting(LoginRequest("das", ""))
-//                )
-//            )
-
-            viewModel.setStateEvent(
-                AccountStateEvent.GetCountries
-            )
-
-           GlobalScope.launch {
-               delay(20)
-               Log.d("DDDD" ,"Main Cancel :) ")
-               viewModel.clear()
-           }
-        }
-
-        requestSetting<String> {
-            meta {
-            }
-        }
     }
 
 

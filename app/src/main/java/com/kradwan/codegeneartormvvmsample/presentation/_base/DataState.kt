@@ -1,11 +1,5 @@
-package com.kradwan.codegeneartormvvmsample.presentation.state
-//
-//sealed class DataState<T> {
-//
-//    class Loading(val status: Boolean) : DataState<Nothing>()
-//    class Data<T>(val state: T) : DataState<T>()
-//    class Exception(val error: String) : DataState<Nothing>()
-//}
+package com.kradwan.codegeneartormvvmsample.presentation._base
+
 
 
 data class DataState<T>(
