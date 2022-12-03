@@ -12,6 +12,9 @@ class MyApp : Application() {
     }
 
     companion object {
+
+
+        
         private var instance: MyApp? = null
 
         fun appContext(): Context = instance!!.applicationContext
